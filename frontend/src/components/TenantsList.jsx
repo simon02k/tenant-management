@@ -54,12 +54,12 @@ export default function TenantsList({ limit = null, table = false }) {
         body: JSON.stringify(updatedData),
       });
 
-      if (res.ok) {
+     {/*} if (res.ok) {
         const updatedTenant = await res.json();
         setTenants(tenants.map(t => (t.houseno === houseno ? updatedTenant : t)));
         setEditModalOpen(false);
         setSelectedTenantEdit(null);
-      }
+      }*/}
     } catch (err) {
       console.error("Error updating tenant:", err);
     }
@@ -71,15 +71,14 @@ export default function TenantsList({ limit = null, table = false }) {
       const res = await fetch(`http://localhost:5000/api/tenants/softdelete/${houseno}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        fetchTenants();
+     {/*} if (res.ok) {
         setTenants(tenants.filter((t) => t.houseno !== houseno)); // remove from table
         if (selectedTenantDelete && selectedTenantDelete.houseno === houseno) {
           setSelectedTenantDelete(null); // clear if deleted
         }
       } else {
         console.error("Failed to delete tenant");
-      }
+      }*/}
     } catch (err) {
       console.error("Error deleting tenant:", err);
     }
@@ -115,14 +114,18 @@ export default function TenantsList({ limit = null, table = false }) {
     // pagination logic
   const indexOfLastTenant = currentPage * tenantsPerPage;
   const indexOfFirstTenant = indexOfLastTenant - tenantsPerPage;
-  const currentTenants = tenants.slice(indexOfFirstTenant, indexOfLastTenant);
+
+  const sortedTenants = [...tenants].reverse();
+
+  const currentTenants = sortedTenants.slice(indexOfFirstTenant, indexOfLastTenant);
 
   const totalPages = Math.ceil(tenants.length / tenantsPerPage);
 
     // Reverse order to show latest first
   const displayTenants = limit
-    ? currentTenants.slice(+limit).reverse()
-    : currentTenants.reverse();
+    ? [...currentTenants].reverse().slice(0, +limit)
+    : [...currentTenants].reverse();
+
 
   // 📌 Table layout for Tenants Page
   if (table) {
@@ -238,7 +241,7 @@ export default function TenantsList({ limit = null, table = false }) {
     <div className="grid gap-4">
       {displayTenants.map((tenant) => (
         <div
-          key={tenant.id}
+          key={tenant.houseno}
           className="p-4 bg-gray-50 rounded-lg border hover:shadow-sm transition"
         >
           <div className="flex justify-between items-center">
